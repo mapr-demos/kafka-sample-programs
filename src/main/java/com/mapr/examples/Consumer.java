@@ -37,7 +37,7 @@ public class Consumer {
             }
             consumer = new KafkaConsumer<>(properties);
         }
-        consumer.subscribe(Arrays.asList("fast-messages"));
+        consumer.subscribe(Arrays.asList("fast-messages", "summary-markers"));
         int timeouts = 0;
         //noinspection InfiniteLoopStatement
         while (true) {

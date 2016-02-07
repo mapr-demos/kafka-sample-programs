@@ -37,7 +37,7 @@ public class Producer {
                             "fast-messages",
                             String.format("{\"type\":\"marker\", \"t\":%.3f, \"k\":%d}", System.nanoTime() * 1e-9, i)));
                     producer.send(new ProducerRecord<String, String>(
-                            "slow-messages",
+                            "summary-markers",
                             String.format("{\"type\":\"other\", \"t\":%.3f, \"k\":%d}", System.nanoTime() * 1e-9, i)));
                     producer.flush();
                     System.out.println("Sent msg number " + i);
