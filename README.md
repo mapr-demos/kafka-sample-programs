@@ -62,7 +62,7 @@ distracting.
 The broker can be configured to auto-create new topics as they are mentioned, but that is often considered a bit 
 dangerous because mis-spelling a topic name doesn't cause a failure.
 
-## Now for the real work
+## Now for the real fun
 At this point, you should have a working Kafka broker running on your
 machine. The next steps are to compile the example programs and play
 around with the way that they work.
@@ -95,7 +95,7 @@ Sent msg number 1000
 Sent msg number 998000
 Sent msg number 999000
 ```
-### Step 5: Start the example consumer
+### Step 6: Start the example consumer
 Running the consumer will now cause all the pending messages to be
 printed. Note that there is a significant latency for the
 messsages. This is because the consumer wasn't running when the
@@ -122,7 +122,7 @@ The consumer should, however, gnaw its way through the backlog pretty quickly,
 however and the per batch latency should be shorter by the end of the
 run than at the beginning.
 
-### Step 6: Send more messages
+### Step 7: Send more messages
 In a separate window, run the producer again without stopping the
 consumer. Note how the messages are displayed almost instantly by the
 consumer and the latencies measured by the consumer are now quite
