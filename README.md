@@ -96,11 +96,22 @@ Sent msg number 998000
 Sent msg number 999000
 ```
 ### Step 6: Start the example consumer
-Running the consumer will now cause all the pending messages to be
-printed. Note that there is a significant latency for the
-messsages. This is because the consumer wasn't running when the
-message were sent to Kafka and thus it is only getting them much
-later, long after they were sent.
+Running the consumer will not actually cause any messages to be
+processed. The reason is that the first time that the consumer is run,
+this will be the first time that the Kafka broker has ever seen the
+consumer group that the consumer is using. That means that the
+consumer group will be created and the default behavior is to position
+newly created consumer groups at the end of all existing data.
+```
+$ target/kafka-example consumer
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+```
+After running the consumer once, however, if we run the producer again
+and then run the consumer *again*, we will see the consumer pick up
+and start processing messages shortly after it starts.
+
 
 ```
 $ target/kafka-example consumer
@@ -118,9 +129,16 @@ Got 31003 records after 0 timeouts
 1000 messages received in period, latency(min, max, avg, 99%) = 12032, 12095, 12064.0, 12095 (ms)
 999001 messages received overall, latency(min, max, avg, 99%) = 12032, 20479, 15070.9, 19583 (ms)
 ```
-The consumer should, however, gnaw its way through the backlog pretty quickly,
-however and the per batch latency should be shorter by the end of the
-run than at the beginning.
+Note that there is a significant latency listed in the summaries for
+the messsage batches. This is because the consumer wasn't running when
+the message were sent to Kafka and thus it is only getting them much
+later, long after they were sent.
+
+The consumer should, however, gnaw its way through the backlog pretty
+quickly, however and the per batch latency should be shorter by the
+end of the run than at the beginning. If the producer is still running
+by the time the consumer catches up, the latencies will probably drop
+into the single digit millisecond range.
 
 ### Step 7: Send more messages
 In a separate window, run the producer again without stopping the
@@ -128,22 +146,29 @@ consumer. Note how the messages are displayed almost instantly by the
 consumer and the latencies measured by the consumer are now quite
 small, especially compared to the first time the consumer was run.
 
+This isn't a real production-scale benchmark, but it does show that
+two processes can send and receive messages at a pretty high rate and
+with pretty low latency.
+
 ## Fun Step: Mess with the consumer
+
 While the producer is producing messages (you may want to put it in a
-loop) and the consumer is eating them, try killing and restarting the
-consumer. The new consumer will wait for about 10 seconds before Kafka
-assigns it to the partitions that the killed consumer was
-handling. Once the consumer gets cooking, however, the latency on the
-records it is processing should drop quickly to the steady state rate
-of a few milliseconds. You can have similar effect by using control-Z
-to pause the consumer for a few seconds but if you do that, the
-consumer should start processing immediately. If you pause for a short
-time, the consumer still has the topic partitions assigned to it, so
-it can start right back up. On the other hand, if you pause for more
-than about 10 seconds, the broker will decide the consumer has died
-and that there is nobody available to handle the partitions in the
-topic. As soon as the consumer comes back, however, it reclaim
-ownership and continue reading data.
+loop so it keeps going) and the consumer is eating them, try killing
+and restarting the consumer. The new consumer will wait for about 10
+seconds before Kafka assigns it to the partitions that the killed
+consumer was handling. Once the consumer gets cooking, however, the
+latency on the records it is processing should drop quickly to the
+steady state rate of a few milliseconds. You can have similar effect
+by using control-Z to pause the consumer for a few seconds but if you
+do that, the consumer should restart processing immediately as soon as
+you let it continue. The way that this works is if you pause for a
+short time, the consumer still has the topic partition assigned to it
+by the Kafka broker, so it can start right back up. On the other hand,
+if you pause for more than about 10 seconds, the broker will decide
+the consumer has died and that there is nobody available to handle the
+partitions in the topic for that consumer group. As soon as the
+consumer program comes back, however, it will reclaim ownership and
+continue reading data.
 
 ## Remaining Mysteries
 If you change the consumer properties, particular the buffer sizes
