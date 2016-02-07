@@ -78,7 +78,7 @@ public class Consumer {
                                 throw new IllegalArgumentException("Illegal message type: " + msg.get("type"));
                         }
                         break;
-                    case "slow-messages":
+                    case "summary-markers":
                         break;
                     default:
                         throw new IllegalStateException("Shouldn't be possible to get message on topic " + record.topic());
