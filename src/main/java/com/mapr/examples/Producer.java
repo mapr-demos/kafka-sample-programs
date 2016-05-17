@@ -6,6 +6,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 import java.util.Properties;
 
 /**
@@ -29,16 +30,16 @@ public class Producer {
                 // send lots of messages
                 producer.send(new ProducerRecord<String, String>(
                         "fast-messages",
-                        String.format("{\"type\":\"test\", \"t\":%.3f, \"k\":%d}", System.nanoTime() * 1e-9, i)));
+                        String.format(Locale.US, "{\"type\":\"test\", \"t\":%.3f, \"k\":%d}", System.nanoTime() * 1e-9, i)));
 
                 // every so often send to a different topic
                 if (i % 1000 == 0) {
                     producer.send(new ProducerRecord<String, String>(
                             "fast-messages",
-                            String.format("{\"type\":\"marker\", \"t\":%.3f, \"k\":%d}", System.nanoTime() * 1e-9, i)));
+                            String.format(Locale.US, "{\"type\":\"marker\", \"t\":%.3f, \"k\":%d}", System.nanoTime() * 1e-9, i)));
                     producer.send(new ProducerRecord<String, String>(
                             "summary-markers",
-                            String.format("{\"type\":\"other\", \"t\":%.3f, \"k\":%d}", System.nanoTime() * 1e-9, i)));
+                            String.format(Locale.US, "{\"type\":\"other\", \"t\":%.3f, \"k\":%d}", System.nanoTime() * 1e-9, i)));
                     producer.flush();
                     System.out.println("Sent msg number " + i);
                 }
